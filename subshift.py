@@ -1,3 +1,7 @@
+# Author:      Dixtosa
+# Description: makes it easy to shift subtitles
+# Date:        2014
+
 import sys, re
 filename=sys.argv[1]
 delta = int(sys.argv[2])

@@ -1,8 +1,11 @@
 # Author:      Dixtosa
-# Description: Gets problems fomr timus parses and outputs into a file
+# Description: Gets problems from timus parses and outputs into a file
+# Date:        2013
+# Dependecies: BeautifulSoup
+#                   can be installed with this command: $ sudo apt-get install python-bs4
 
-from urllib2 import urlopen
-import urllib
+import urllib2
+import sys
 from bs4 import BeautifulSoup, NavigableString
 
 def getID(soup):
@@ -54,11 +57,14 @@ def parse(PAGE):
 	TIME_LIMIT = Limits[0].split (":")[1][1:];
 	MEMORY_LIMIT = Limits[1].get_text().split (":")[1][1:];
 
+	print TIME_LIMIT, MEMORY_LIMIT
+
 	BACKGROUND = "		   None"
 	if subtitles[0].contents[sub] == "Background":
 		BACKGROUND = subtitles[sub].next_sibling.get_text() + "\n"
 		sub+=1
-	
+
+	print TIME_LIMIT, MEMORY_LIMIT	
 	
 	PROBLEM=""
 	paragraphs = soup.find_all("div", class_="problem_par");
@@ -122,21 +128,13 @@ ACCS:				 %s
 	return result % args
 
 
-def DIFF_TO_PROBLEM_STATISTICS(PAGE):
-	return getDifficulty(BeautifulSoup(PAGE))
-
-def getProblemList():
-	#f = open ("problemlist.txt")
-	#problems = [p.strip() for p in f.readlines()]
-	#f.close()
-	return problems
-
 problemsFilename = "problems.txt"
 queryURL = "http://acm.timus.ru/problem.aspx?space=1&num="
 
 def Main():
-	print "usage: \n\t\tgettimus.py start end <- assumes start=1000\n\t\tgettimus.py end\nindices are invlusive"
-	
+	print "usage: \n\t\tgettimus.py start end\n\t\tgettimus.py end <- assumes start=1000\nindices are inclusive"
+	start, end = "1000", ""
+
 	if len(sys.argv) == 2:
 		end = sys.argv[1]
 	elif len(sys.argv) == 3:
@@ -144,17 +142,21 @@ def Main():
 	else:
 		print "read usage!"
 		quit()
-
-	problems = [str(p) for p in range(start, end+1)]
+	start = int(start)
+	end = int(end)
+	problems = [str(p) for p in range(start, end + 1)]
 	exclusion = []
+
+	#if  the first problem is 1000 then rewrite otherwise append
+	problemsFile = open(problemsFilename, "w" if start == 1000 else "a") 
 
 	for counter, number in enumerate(problems):
 		URL = queryURL + number
 		pgObj = None
 		try:
-			pgObj = urllib.urlopen(URL)
-		except e:
-			print "Exception: " + e.error()
+			pgObj = urllib2.urlopen(URL)
+		except:
+			print "Exception occured"
 			if raw_input("continue? [Y/n]:").lower() == "y":
 				print "OK, skipping %sth" % (number)
 				continue
@@ -170,11 +172,11 @@ def Main():
 		except:
 			exclusion.append(number);
 			
-		print "%f% done"(100.0 * counter / len(problems))
+		print "%f\% done" % (100.0 * counter / len(problems))
 	
 	problemsFile.close()
 	print "Omitted problems (total %d):" % (len(exclusion))
-	print exclusion
+	#print exclusion
 	#print difficulties
 
 Main()

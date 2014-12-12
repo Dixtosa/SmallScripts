@@ -1,16 +1,17 @@
-#Name:            DesktopMover.py
-#Author:          Dixtosa
-#Date started:    08.01.2OO9
-#website:         Dixtosa.wordpress.com
+# Name :          DesktopMover
+# Author :        Dixtosa
+# Date  started:  08.01.2OO9
+# Website :       Dixtosa.wordpress.com
+# Description :   Makes it easier to move dekstop folder. It works on winXP only
 
 import os, time
 
 print "Desired desktop path (example: D:\\desktop\n):"
-des=raw_input("Enter Path:")
-des=des.replace("/","\\")
+des = raw_input("Enter Path:")
+des = des.replace("/","\\")
 
-F='reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /V Desktop /T REG_SZ /D '+des+' /F'
-S='reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /V Desktop /T REG_SZ /D '+des+' /F'
+F = 'reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /V Desktop /T REG_SZ /D ' + des + ' /F'
+S = 'reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /V Desktop /T REG_SZ /D ' + des + ' /F'
 
 os.system(F)
 time.sleep(1)
