@@ -53,19 +53,20 @@ def parse(PAGE):
 	ID = getID(soup)
 	NAME = getName(soup)
 	
-	Limits = soup.find_all("div", class_="problem_limits")[0].contents;
-	TIME_LIMIT = Limits[0].split (":")[1][1:];
-	MEMORY_LIMIT = Limits[1].get_text().split (":")[1][1:];
 
-	print TIME_LIMIT, MEMORY_LIMIT
+	Limits = soup.find_all("div", class_="problem_limits")[0].contents;
+
+	TIME_LIMIT = Limits[0].split (":")[1][1:];
+	
+	MEMORY_LIMIT = Limits[2].split (":")[1][1:];
+	
+
 
 	BACKGROUND = "		   None"
 	if subtitles[0].contents[sub] == "Background":
 		BACKGROUND = subtitles[sub].next_sibling.get_text() + "\n"
 		sub+=1
 
-	print TIME_LIMIT, MEMORY_LIMIT	
-	
 	PROBLEM=""
 	paragraphs = soup.find_all("div", class_="problem_par");
 
@@ -100,11 +101,11 @@ def parse(PAGE):
 	
 	ALLACC = soup.find_all("a", href="status.aspx?space=1&num="+ID+"&status=accepted")[0].contents[0].split (" (")[1][:-1]
 
-	
 	return (ID, NAME, TIME_LIMIT, MEMORY_LIMIT,
 				   BACKGROUND, PROBLEM, INPUT_TEXT, OUTPUT_TEXT, SAMPLES, HINT_TEXT, SOURCE, TAG.title(), DIFFICULTY, ALL, ALLACC)
 	
 def formatProblem(*args):
+	args = args[0]
 	result = """\
 PROBLEM CODE:		 %s
 PROBLEM TITLE:		%s
@@ -166,13 +167,14 @@ def Main():
 		
 		try:
 			parameters = parse( pgObj.read() )
-			difficulties.append(parameters[-3]) #I know I know ugly
 			problemBody = formatProblem(parameters) + "\n"*7
 			problemsFile.write(problemBody.encode ("utf8"))
+			problemsFile.flush()
 		except:
+			print "exception in parsing"
 			exclusion.append(number);
 			
-		print "%f\% done" % (100.0 * counter / len(problems))
+		print 100.0 * (counter + 1) / len(problems), "% done"
 	
 	problemsFile.close()
 	print "Omitted problems (total %d):" % (len(exclusion))
